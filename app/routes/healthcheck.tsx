@@ -11,4 +11,13 @@ export const loader: LoaderFunction = async ({ request }) => {
     // and make a HEAD request to ourselves, then we're good.
     await Promise.all([
       prisma.user.count(),
-      fetch(`http://${host}`, { method: "HEAD"
+      fetch(`http://${host}`, { method: "HEAD" }).then((r) => {
+        if (!r.ok) return Promise.reject(r);
+      }),
+    ]);
+    return new Response("OK");
+  } catch (error: unknown) {
+    console.log("healthcheck ❌", { error });
+    return new Response("ERROR", { status: 500 });
+  }
+};
