@@ -117,4 +117,21 @@ export default function Index() {
               },
               {
                 src: "https://user-images.githubusercontent.com/1500684/157773063-20a0ed64-b9f8-4e0b-9d1e-0b65a3d4a6db.svg",
-        
+                alt: "TypeScript",
+                href: "https://typescriptlang.org",
+              },
+            ].map((img) => (
+              <a
+                key={img.href}
+                href={img.href}
+                className="flex h-16 w-32 justify-center p-1 grayscale transition hover:grayscale-0 focus:grayscale-0"
+              >
+                <img alt={img.alt} src={img.src} />
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
