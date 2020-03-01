@@ -3,16 +3,15 @@ import * as React from "react";
 import type { ActionFunction, LoaderFunction, MetaFunction } from "remix";
 import {
   Form,
+  json,
   Link,
+  useActionData,
   redirect,
   useSearchParams,
-  json,
-  useActionData,
 } from "remix";
 
-import { getUserId, createUserSession } from "~/session.server";
-
-import { createUser, getUserByEmail } from "~/models/user.server";
+import { createUserSession, getUserId } from "~/session.server";
+import { verifyLogin } from "~/models/user.server";
 import { validateEmail } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -22,7 +21,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 interface ActionData {
-  errors: {
+  errors?: {
     email?: string;
     password?: string;
   };
@@ -33,6 +32,7 @@ export const action: ActionFunction = async ({ request }) => {
   const email = formData.get("email");
   const password = formData.get("password");
   const redirectTo = formData.get("redirectTo");
+  const remember = formData.get("remember");
 
   if (!validateEmail(email)) {
     return json<ActionData>(
@@ -55,33 +55,32 @@ export const action: ActionFunction = async ({ request }) => {
     );
   }
 
-  const existingUser = await getUserByEmail(email);
-  if (existingUser) {
+  const user = await verifyLogin(email, password);
+
+  if (!user) {
     return json<ActionData>(
-      { errors: { email: "A user already exists with this email" } },
+      { errors: { email: "Invalid email or password" } },
       { status: 400 }
     );
   }
 
-  const user = await createUser(email, password);
-
   return createUserSession({
     request,
     userId: user.id,
-    remember: false,
-    redirectTo: typeof redirectTo === "string" ? redirectTo : "/",
+    remember: remember === "on" ? true : false,
+    redirectTo: typeof redirectTo === "string" ? redirectTo : "/notes",
   });
 };
 
 export const meta: MetaFunction = () => {
   return {
-    title: "Sign Up",
+    title: "Login",
   };
 };
 
-export default function Join() {
+export default function LoginPage() {
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? undefined;
+  const redirectTo = searchParams.get("redirectTo") || "/notes";
   const actionData = useActionData() as ActionData;
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
@@ -157,19 +156,33 @@ export default function Join() {
             type="submit"
             className="w-full rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
           >
-            Create Account
+            Log in
           </button>
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                id="remember"
+                name="remember"
+                type="checkbox"
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="remember"
+                className="ml-2 block text-sm text-gray-900"
+              >
+                Remember me
+              </label>
+            </div>
             <div className="text-center text-sm text-gray-500">
-              Already have an account?{" "}
+              Don't have an account?{" "}
               <Link
                 className="text-blue-500 underline"
                 to={{
-                  pathname: "/login",
+                  pathname: "/join",
                   search: searchParams.toString(),
                 }}
               >
-                Log in
+                Sign up
               </Link>
             </div>
           </div>
