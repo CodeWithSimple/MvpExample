@@ -56,4 +56,18 @@ export default function NotesPage() {
                     }
                     to={note.id}
                   >
-                    📝 {not
+                    📝 {note.title}
+                  </NavLink>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+
+        <div className="flex-1 p-6">
+          <Outlet />
+        </div>
+      </main>
+    </div>
+  );
+}
