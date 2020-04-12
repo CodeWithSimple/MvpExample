@@ -65,4 +65,13 @@ function deleteUserByEmail(email: string) {
   cy.exec(
     `node --require esbuild-register ./cypress/support/delete-user.ts "${email}"`
   );
-  cy.clearCookie("__session"
+  cy.clearCookie("__session");
+}
+
+Cypress.Commands.add("login", login);
+Cypress.Commands.add("cleanupUser", cleanupUser);
+
+/*
+eslint
+  @typescript-eslint/no-namespace: "off",
+*/
