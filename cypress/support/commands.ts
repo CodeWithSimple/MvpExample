@@ -16,4 +16,28 @@ declare global {
       login: typeof login;
 
       /**
-   
+       * Deletes the current @user
+       *
+       * @returns {typeof cleanupUser}
+       * @memberof Chainable
+       * @example
+       *    cy.cleanupUser()
+       * @example
+       *    cy.cleanupUser({ email: 'whatever@example.com' })
+       */
+      cleanupUser: typeof cleanupUser;
+    }
+  }
+}
+
+function login({
+  email = faker.internet.email(undefined, undefined, "example.com"),
+}: {
+  email?: string;
+} = {}) {
+  cy.then(() => ({ email })).as("user");
+  cy.exec(
+    `node --require esbuild-register ./cypress/support/create-user.ts "${email}"`
+  ).then(({ stdout }) => {
+    const cookieValue = stdout
+      .replace(/.*<cookie>(?<cookieVal
