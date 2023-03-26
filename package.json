@@ -22,4 +22,27 @@
     "start": "remix-serve build",
     "start:mocks": "node --require ./mocks ./node_modules/.bin/remix-serve build",
     "test": "vitest",
-    "test:e2e:dev": "start-server-and-test de
+    "test:e2e:dev": "start-server-and-test dev http://localhost:3000 'cypress open'",
+    "pretest:e2e:run": "npm run build",
+    "test:e2e:run": "cross-env PORT=8811 start-server-and-test start:mocks http://localhost:8811 'cypress run'",
+    "typecheck": "tsc -b && tsc -b cypress"
+  },
+  "prettier": {},
+  "eslintIgnore": [
+    "/node_modules",
+    "/build",
+    "/public/build"
+  ],
+  "dependencies": {
+    "@node-rs/bcrypt": "^1.6.0",
+    "@prisma/client": "^3.11.0",
+    "@reach/alert": "^0.16.0",
+    "@remix-run/react": "*",
+    "@remix-run/serve": "*",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "remix": "*",
+    "tiny-invariant": "^1.2.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": 
